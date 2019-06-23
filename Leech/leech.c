@@ -111,7 +111,7 @@
 
 
 
-
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -775,7 +775,7 @@ static void decoder_Q24(Q24 *q, uint64_t *cv, uint64_t *d)
  * *cv: pointer to outputted bits
  *  *d: pointer to outputted SED
  */
-void decoder_L24(const uint32_t *t, uint64_t *cv, uint64_t *d)
+int decoder_L24(const uint32_t *t, uint64_t *cv, uint64_t *d)
 {
 	uint64_t cv_q[4];
 	uint64_t d_q[4];
@@ -783,21 +783,38 @@ void decoder_L24(const uint32_t *t, uint64_t *cv, uint64_t *d)
 	uint64_t d_ij[12][2][2];
 	int64_t delta_ij[12][2][2];
 	uint8_t offsets[12];
-
+	time_t out[2];
+	time_t in[4];
+    int i;
 	int coset_h, coset_q;
+
 	for (coset_h = 0; coset_h < 2; ++coset_h) {
+        out[coset_h] = time(NULL);
 		precomputation_H24(t, d_ij, delta_ij, offsets, coset_h);
 
 		for (coset_q = 0; coset_q < 2; ++coset_q) {
+            in[coset_h*2 + coset_q] = time(NULL);
 			int coset = 2 * coset_h + coset_q;
 			Q24 *q = init_Q24(d_ij, delta_ij, offsets, coset_h, coset_q);
 			decoder_Q24(q, &cv_q[coset], &d_q[coset]);
 			free(q);
+            in[coset_h*2 + coset_q] = time(NULL) - in[coset_h*2 + coset_q];
 		}
+		out[coset_h] = time(NULL) - out[coset_h];
 	}
 
 	min_metric(d_q, cv_q, 4);
 
 	*d = d_q[0];
 	*cv = cv_q[0] & 0x00ffffffffffffff;
+
+	if(out[1] - out[0] < 10 && out[1] - out[0] > -10){
+        for(i=0; i<3; i++){
+            if(in[i+1] - in[i] >= 10 && in[i+1] - in[i] <= -10){
+                return 0;
+            }
+        }
+        return 1;
+	}
+	return 0;
 }
