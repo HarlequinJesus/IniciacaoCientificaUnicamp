@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <time.h>
 #include "leech.h"
 
 /* Leech lattice generator matrix in standard MOG
@@ -195,3 +195,17 @@ void printvb(const uint64_t v, uint8_t spacing)
 	}
 	printf("\n");
 }
+
+/******************************************************
+ * Decoding full implementation
+ ******************************************************/
+/*Implements the decoders and returns the time used in the process
+ */
+
+long decode_leech(uint32_t *out, const uint32_t *t,  uint64_t *d){
+    time_t sec = time(NULL);
+    uint64_t cv;
+    decoder_L24(t, &cv, d);
+    decode_pt(out, cv, 0);
+    return time(NULL) - sec;
+ }
