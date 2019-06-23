@@ -20,4 +20,7 @@ void decode_pt(uint32_t *out, uint64_t cv, int verbose);
 void printvu(const uint32_t *v);
 void printvb(const uint64_t v, uint8_t spacing);
 
+/*decoding*/
+long decode_leech(uint32_t *out, const uint32_t *t);
 #endif
+
