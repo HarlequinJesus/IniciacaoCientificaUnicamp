@@ -46,6 +46,6 @@ extern uint8_t hexacode[64][6];
  *    d: output distance (squared euclidean distance
  *       between input/output vectors)
  */
-void decoder_L24(const uint32_t *t, uint64_t *cv, uint64_t *d);
+int decoder_L24(const uint32_t *t, uint64_t *cv, uint64_t *d);
 
 #endif
